@@ -1,2 +1,2 @@
-# space_invaders
-game using raylib
+# physics_raylib
+physics using raylib
