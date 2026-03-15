@@ -14,63 +14,68 @@ typedef struct {
     Color color;
 } Ball;
 
+void initBalls(Ball balls[], int numberOfBalls);
+void collisionBalls(Ball balls[], int numberOfBalls);
+void drawBalls(Ball balls[], int numberOfBalls);
+void moveBalls(Ball balls[], int numberOfBalls);
 void moveBall(Ball *ball);
-void collisionBalls(Ball **balls, int numberOfBalls);
 void collisionTwoBalls(Ball *ball_A, Ball *ball_B);
-
-// TODO: Refactorizar la manera de crear pelotas, manejar su movimiento y dibujarlas.
 
 int main(void) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Physics");
 
-    Ball redBall = {
-        (Vector2){(float)SCREEN_WIDTH/3, (float)SCREEN_HEIGHT/2},
-        (Vector2){ 5.0f, 10.0f },
-        30,
-        MAROON
-    };
-
-    Ball blueBall = {
-        (Vector2){(float)SCREEN_WIDTH*2/3, (float)SCREEN_HEIGHT/2},
-        (Vector2){ -5.0f, -10.0f },
-        30,
-        BLUE 
-    };
-
-    Ball greenBall = {
-        (Vector2){(float)SCREEN_WIDTH, (float)SCREEN_HEIGHT/2},
-        (Vector2){ 5.0f, -10.0f },
-        30,
-        GREEN 
-    };
-
-    int numberOfBalls = 3;
-    Ball **balls = malloc(numberOfBalls * sizeof(Ball *));
-    balls[0] = &redBall;
-    balls[1] = &blueBall;
-    balls[2] = &greenBall;
+    int numberOfBalls = 20;
+    Ball balls[numberOfBalls];
+    initBalls(balls, numberOfBalls);
 
     SetTargetFPS(60);
 
     while (!WindowShouldClose()) {
 
-        moveBall(&redBall);
-        moveBall(&blueBall);
-        moveBall(&greenBall);
+        moveBalls(balls, numberOfBalls);
         collisionBalls(balls, numberOfBalls);
 
         BeginDrawing();
 
             ClearBackground(RAYWHITE);
 
-            DrawCircleV(redBall.pos, redBall.radius, redBall.color);
-            DrawCircleV(blueBall.pos, blueBall.radius, blueBall.color);
-            DrawCircleV(greenBall.pos, greenBall.radius, greenBall.color);
+            drawBalls(balls, numberOfBalls);
 
         EndDrawing();
     }
     CloseWindow();
     return 0;
+}
+
+void initBalls(Ball balls[], int numberOfBalls) {
+    for (int i = 0; i < numberOfBalls; i++) {
+        Ball ball = {
+            (Vector2){(float)GetRandomValue(0, SCREEN_WIDTH), (float)GetRandomValue(0, SCREEN_HEIGHT)},
+            (Vector2){(float)GetRandomValue(-5.0, 5.0), (float)GetRandomValue(-5.0, 5.0)},
+            GetRandomValue(20, 30),
+            (Color){
+                GetRandomValue(0, 255),
+                GetRandomValue(0, 255),
+                GetRandomValue(0, 255),
+                255,
+            }};
+
+        balls[i] = ball;
+    }
+}
+
+void moveBalls(Ball balls[], int numberOfBalls)
+{
+    for (int i = 0; i < numberOfBalls; i++)
+    {       
+        moveBall(&balls[i]);   
+    }
+}
+
+void drawBalls(Ball balls[], int numberOfBalls) {
+    for (int i = 0; i < numberOfBalls; i++) {
+        DrawCircleV(balls[i].pos, balls[i].radius, balls[i].color);
+    }
 }
 
 void moveBall(Ball *ball) {
@@ -99,10 +104,10 @@ void moveBall(Ball *ball) {
     }
 }
 
-void collisionBalls(Ball **balls, int numberOfBalls) {
+void collisionBalls(Ball balls[], int numberOfBalls) {
     for (int i = 0; i < numberOfBalls; i++) {
         for (int j = i + 1; j < numberOfBalls; j++) {
-            collisionTwoBalls(balls[i], balls[j]);
+            collisionTwoBalls(&balls[i], &balls[j]);
         }
     }
 }
